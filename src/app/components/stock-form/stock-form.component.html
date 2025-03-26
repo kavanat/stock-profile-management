@@ -1,0 +1,49 @@
+<form [formGroup]="stockForm" (ngSubmit)="onSubmit()" class="stock-form">
+  <div class="mb-3">
+    <label for="symbol" class="form-label">Stock Symbol</label>
+    <select id="symbol" class="form-select" formControlName="symbol">
+      <option value="">Select a stock</option>
+      <option *ngFor="let stock of stockOptions" [value]="stock.symbol">
+        {{stock.symbol}} - {{stock.name}} (Current: ${{stock.price}})
+      </option>
+    </select>
+    <div class="invalid-feedback" *ngIf="stockForm.get('symbol')?.errors?.['required'] && stockForm.get('symbol')?.touched">
+      Please select a stock
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="quantity" class="form-label">Quantity</label>
+    <input type="number" class="form-control" id="quantity" formControlName="quantity">
+    <div class="invalid-feedback" *ngIf="stockForm.get('quantity')?.errors?.['required'] && stockForm.get('quantity')?.touched">
+      Quantity is required
+    </div>
+    <div class="invalid-feedback" *ngIf="stockForm.get('quantity')?.errors?.['min'] && stockForm.get('quantity')?.touched">
+      Quantity must be at least 1
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="price" class="form-label">Price per Share</label>
+    <input type="number" class="form-control" id="price" formControlName="price" step="0.01">
+    <div class="invalid-feedback" *ngIf="stockForm.get('price')?.errors?.['required'] && stockForm.get('price')?.touched">
+      Price is required
+    </div>
+    <div class="invalid-feedback" *ngIf="stockForm.get('price')?.errors?.['min'] && stockForm.get('price')?.touched">
+      Price must be greater than 0
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="alert alert-success" *ngIf="success">
+    {{ success }}
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="!stockForm.valid || isLoading">
+    <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+    {{ isLoading ? 'Adding...' : 'Add Stock' }}
+  </button>
+</form>

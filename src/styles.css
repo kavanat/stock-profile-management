@@ -1,0 +1,118 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --primary-color: #2c3e50;  /* Dark blue - professional banking color */
+  --secondary-color: #34495e;  /* Slightly lighter blue */
+  --accent-color: #ecf0f1;  /* Light gray - clean background */
+  --text-color: #2c3e50;  /* Dark blue - readable text */
+  --header-text: #ffffff;  /* White text for header */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  background-color: var(--accent-color);
+}
+
+.navbar {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.2rem 0;
+  margin-bottom: 2rem;
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--header-text) !important;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-brand:hover {
+  color: var(--header-text) !important;
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.navbar-brand i {
+  color: var(--header-text);
+  margin-right: 0.5rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Card styles */
+.card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  background-color: white;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background-color: var(--primary-color);
+  color: var(--header-text);
+  border-bottom: none;
+  padding: 1.2rem;
+  font-weight: 600;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Table styles */
+.table {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+  background-color: var(--primary-color);
+  color: var(--header-text);
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+}
+
+/* Form styles */
+.form-control:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+}
+
+/* Additional styles for better visibility */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--text-color);
+} 
