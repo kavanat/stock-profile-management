@@ -40,20 +40,37 @@ public class PortfolioService {
     public StockHolding addStock(Long portfolioId, String symbol, Integer quantity, Double price) {
         Portfolio portfolio = getPortfolio(portfolioId);
         
-        StockHolding holding = new StockHolding();
-        holding.setPortfolio(portfolio);
-        holding.setSymbol(symbol);
-        holding.setQuantity(quantity);
-        holding.setAveragePrice(price);
+        // Check if stock already exists in portfolio
+        StockHolding holding = stockHoldingRepository.findByPortfolioIdAndSymbol(portfolioId, symbol)
+                .orElse(new StockHolding());
+        
+        if (holding.getId() == null) {
+            // New stock holding
+            holding.setPortfolio(portfolio);
+            holding.setSymbol(symbol);
+            holding.setQuantity(quantity);
+            holding.setAveragePrice(price);
+            portfolio.getHoldings().add(holding);
+        } else {
+            // Update existing holding
+            int newQuantity = holding.getQuantity() + quantity;
+            double newAveragePrice = calculateNewAveragePrice(holding, quantity, price);
+            
+            holding.setQuantity(newQuantity);
+            holding.setAveragePrice(newAveragePrice);
+        }
         
         // Update current value with real-time price
         Double currentPrice = marketDataService.getCurrentPrice(symbol);
-        holding.setCurrentValue(quantity * currentPrice);
+        holding.setCurrentValue(holding.getQuantity() * currentPrice);
         
-        portfolio.getHoldings().add(holding);
         updatePortfolioTotalValue(portfolio);
-        
         return stockHoldingRepository.save(holding);
+    }
+
+    private double calculateNewAveragePrice(StockHolding existing, Integer newQuantity, Double newPrice) {
+        double totalValue = (existing.getQuantity() * existing.getAveragePrice()) + (newQuantity * newPrice);
+        return totalValue / (existing.getQuantity() + newQuantity);
     }
 
     @Transactional
