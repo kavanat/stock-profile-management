@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { StockFormComponent } from '../stock-form/stock-form.component';
 import { PortfolioService } from '../../services/portfolio.service';
 import { Portfolio } from '../../models/portfolio';
-import { StockFormComponent } from '../stock-form/stock-form.component';
+import { StockHolding } from '../../models/stock-holding';
 
 @Component({
   selector: 'app-portfolio',
@@ -14,52 +15,61 @@ import { StockFormComponent } from '../stock-form/stock-form.component';
 })
 export class PortfolioComponent implements OnInit {
   portfolio: Portfolio | null = null;
+  holdings: StockHolding[] = [];
+  portfolioId: number = 1;
   error: string | null = null;
-  portfolioId: number = 1; // Changed from private to public
 
   constructor(private portfolioService: PortfolioService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadPortfolio();
   }
 
-  loadPortfolio() {
+  loadPortfolio(): void {
+    this.error = null;
     this.portfolioService.getPortfolio(this.portfolioId).subscribe({
       next: (data) => {
         this.portfolio = data;
+        this.holdings = data.holdings || [];
       },
-      error: (err) => {
-        if (err.status === 404) {
+      error: (error) => {
+        if (error.status === 404) {
           // Create a new portfolio if it doesn't exist
           this.portfolioService.createPortfolio('My Portfolio').subscribe({
-            next: (data) => {
-              this.portfolio = data;
-              this.portfolioId = data.id;
+            next: (newPortfolio) => {
+              this.portfolio = newPortfolio;
+              this.portfolioId = newPortfolio.id;
+              this.holdings = [];
             },
             error: (err) => {
-              this.error = 'Failed to create portfolio. Please try again.';
+              this.error = 'Error creating portfolio. Please try again.';
+              console.error('Error creating portfolio:', err);
             }
           });
         } else {
-          this.error = 'Failed to load portfolio. Please try again.';
+          this.error = 'Error loading portfolio. Please try again.';
+          console.error('Error loading portfolio:', error);
         }
       }
     });
   }
 
-  onStockAdded() {
+  onStockAdd(): void {
     this.loadPortfolio();
   }
 
-  deleteStock(symbol: string) {
-    this.portfolioService.deleteStock(this.portfolioId, symbol).subscribe({
-      next: () => {
-        this.loadPortfolio();
-      },
-      error: (err) => {
-        this.error = 'Failed to delete stock. Please try again.';
-      }
-    });
+  deleteStock(stockId: number): void {
+    if (this.portfolio) {
+      this.portfolioService.deleteStock(this.portfolioId, stockId.toString()).subscribe({
+        next: () => {
+          this.loadPortfolio();
+        },
+        error: (error) => {
+          this.error = 'Error deleting stock. Please try again.';
+          console.error('Error deleting stock:', error);
+        }
+      });
+    }
   }
 }
 

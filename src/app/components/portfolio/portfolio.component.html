@@ -6,10 +6,6 @@
           <h2 class="mb-0">My Portfolio</h2>
         </div>
         <div class="card-body">
-          <div *ngIf="error" class="alert alert-danger">
-            {{ error }}
-          </div>
-
           <div *ngIf="!portfolio" class="text-center">
             <div class="spinner-border" role="status">
               <span class="visually-hidden">Loading...</span>
@@ -29,13 +25,13 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let holding of portfolio.holdings">
+                  <tr *ngFor="let holding of holdings">
                     <td>{{ holding.symbol }}</td>
                     <td>{{ holding.quantity }}</td>
                     <td>${{ holding.averagePrice.toFixed(2) }}</td>
                     <td>${{ holding.currentValue.toFixed(2) }}</td>
                     <td>
-                      <button class="btn btn-danger btn-sm" (click)="deleteStock(holding.symbol)">
+                      <button class="btn btn-danger btn-sm" (click)="deleteStock(holding.id)">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -55,10 +51,10 @@
     <div class="col-md-4">
       <div class="card">
         <div class="card-header">
-          <h4 class="mb-0">Stock Profile</h4>
+          <h4 class="mb-0">Add Stock</h4>
         </div>
         <div class="card-body">
-          <app-stock-form [portfolioId]="portfolioId" (stockAdded)="onStockAdded()"></app-stock-form>
+          <app-stock-form [portfolioId]="portfolioId" (stockAdded)="onStockAdd()"></app-stock-form>
         </div>
       </div>
     </div>
