@@ -180,18 +180,15 @@
 <!-- Main container -->
 <div class="app-container">
   <!-- Header -->
-  <nav class="navbar navbar-expand-lg">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" routerLink="/">
-        <i class="fas fa-chart-line me-2"></i>
-        {{ title }}
-      </a>
+      <a class="navbar-brand" href="#">{{ title }}</a>
     </div>
   </nav>
 
   <!-- Main content -->
   <div class="container mt-4">
-    <router-outlet></router-outlet>
+    <app-portfolio></app-portfolio>
   </div>
 </div>
 
