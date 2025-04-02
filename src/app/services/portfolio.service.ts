@@ -6,6 +6,7 @@ import { StockHolding } from '../models/stock-holding';
 import { environment } from '../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface Stock {
   symbol: string;
@@ -30,13 +31,13 @@ export class PortfolioService {
   }
 
   addStock(portfolioId: number, symbol: string, quantity: number, price: number): Observable<Portfolio> {
-    return this.http.post<Portfolio>(`${this.apiUrl}/${portfolioId}/stocks`, null, {
-      params: {
-        symbol,
-        quantity: quantity.toString(),
-        price: price.toString()
-      }
-    });
+    return this.http.post<Portfolio>(`${this.apiUrl}/${portfolioId}/stocks`, {
+      symbol,
+      quantity,
+      price
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   removeStock(portfolioId: number, symbol: string, quantity?: number): Observable<Portfolio> {
@@ -44,8 +45,16 @@ export class PortfolioService {
     if (quantity) {
       url += `?reduce=${quantity}`;
     }
-    return this.http.delete<Portfolio>(url).pipe(
-      catchError(this.handleError)
+    return this.http.delete<void>(url).pipe(
+      catchError(error => {
+        console.error('Error removing stock:', error);
+        if (error.status === 500) {
+          return this.getPortfolio(portfolioId);
+        }
+        return throwError(() => error.error?.message || 'Failed to remove stock from portfolio');
+      })
+    ).pipe(
+      switchMap(() => this.getPortfolio(portfolioId))
     );
   }
 

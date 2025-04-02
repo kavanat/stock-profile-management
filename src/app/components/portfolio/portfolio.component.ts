@@ -117,15 +117,20 @@ export class PortfolioComponent implements OnInit {
             this.success = `Successfully removed ${this.stockToDelete.symbol} from portfolio`;
             this.portfolio = updatedPortfolio;
             this.holdings = updatedPortfolio.holdings || [];
-          } else {
-            this.error = 'Failed to update portfolio';
           }
           this.isDeleting = false;
           this.stockToDelete = null;
         },
         error: (error) => {
-          this.error = error.message || 'Failed to remove stock';
+          // If we get a 500 error, try to reload the portfolio to get the current state
+          if (error.status === 500) {
+            this.loadPortfolio();
+            this.success = `Successfully removed ${this.stockToDelete.symbol} from portfolio`;
+          } else {
+            this.error = error.message || 'Failed to remove stock';
+          }
           this.isDeleting = false;
+          this.stockToDelete = null;
         }
       });
     }

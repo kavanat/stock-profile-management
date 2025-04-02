@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { PortfolioService } from '../../services/portfolio.service';
 import { StockService } from '../../services/stock.service';
 import { debounceTime, distinctUntilChanged, switchMap, tap, map } from 'rxjs/operators';
+import { StockPrice } from '../../models/stock-price';
 
 @Component({
   selector: 'app-stock-form',
@@ -102,6 +103,12 @@ import { debounceTime, distinctUntilChanged, switchMap, tap, map } from 'rxjs/op
           <div class="invalid-feedback" *ngIf="stockForm.get('quantity')?.invalid && stockForm.get('quantity')?.touched">
             Please enter a valid quantity
           </div>
+        </div>
+
+        <!-- Warning Message for Access Issues -->
+        <div class="alert alert-warning mt-3" *ngIf="warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ warning }}
         </div>
 
         <div class="mt-4">
@@ -211,6 +218,14 @@ import { debounceTime, distinctUntilChanged, switchMap, tap, map } from 'rxjs/op
       margin-top: 1rem;
       border-radius: 0.5rem;
     }
+    .alert-warning {
+      background-color: #fff3cd;
+      border-color: #ffeeba;
+      color: #856404;
+    }
+    .alert-warning i {
+      color: #856404;
+    }
   `]
 })
 export class StockFormComponent implements OnInit {
@@ -220,10 +235,12 @@ export class StockFormComponent implements OnInit {
   stockForm: FormGroup;
   error: string | null = null;
   success: string | null = null;
+  warning: string | null = null;
   isSearching = false;
   isAdding = false;
   searchResults: any[] = [];
   selectedStockDetails: any = null;
+  private readonly HIGH_VALUE_THRESHOLD = 1000; // $1000 threshold for high-value stocks
 
   constructor(
     private fb: FormBuilder,
@@ -278,6 +295,7 @@ export class StockFormComponent implements OnInit {
     // Set loading state
     this.isSearching = true;
     this.error = null;
+    this.warning = null;
     this.selectedStockDetails = null;
     
     // Fetch stock details when a stock is selected
@@ -295,7 +313,11 @@ export class StockFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching stock details:', error);
-        this.error = 'Error fetching stock details. Please try again.';
+        if (error.message.includes('Warning: This stock requires a higher subscription tier')) {
+          this.warning = error.message;
+        } else {
+          this.error = 'Error fetching stock details. Please try again.';
+        }
         this.isSearching = false;
         this.selectedStockDetails = null;
       }
@@ -307,6 +329,7 @@ export class StockFormComponent implements OnInit {
     this.selectedStockDetails = null;
     this.searchResults = [];
     this.error = null;
+    this.warning = null;
     this.isSearching = false;
   }
 
@@ -316,9 +339,15 @@ export class StockFormComponent implements OnInit {
       this.isAdding = true;
       this.error = null;
       this.success = null;
+      this.warning = null;
 
       this.stockService.getStockPrice(symbol).subscribe({
         next: (price: number) => {
+          // Check if the stock price is above the threshold
+          if (price > this.HIGH_VALUE_THRESHOLD) {
+            this.warning = `Warning: This stock is currently valued at $${price.toFixed(2)}. High-value stocks may require special permissions or a higher subscription tier.`;
+          }
+
           this.portfolioService.addStock(this.portfolioId, symbol, quantity, price).subscribe({
             next: () => {
               this.success = 'Stock added successfully!';
@@ -329,13 +358,21 @@ export class StockFormComponent implements OnInit {
               this.isAdding = false;
             },
             error: (error) => {
-              this.error = error.message || 'Failed to add stock to portfolio';
+              if (error.message.includes('Warning: This stock requires a higher subscription tier')) {
+                this.warning = error.message;
+              } else {
+                this.error = error.message || 'Failed to add stock to portfolio';
+              }
               this.isAdding = false;
             }
           });
         },
         error: (error) => {
-          this.error = error.message || 'Failed to fetch stock price';
+          if (error.message.includes('Warning: This stock requires a higher subscription tier')) {
+            this.warning = error.message;
+          } else {
+            this.error = error.message || 'Failed to fetch stock price';
+          }
           this.isAdding = false;
         }
       });

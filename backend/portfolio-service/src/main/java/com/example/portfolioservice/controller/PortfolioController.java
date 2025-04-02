@@ -1,5 +1,6 @@
 package com.example.portfolioservice.controller;
 
+import com.example.portfolioservice.model.AddStockRequest;
 import com.example.portfolioservice.model.Portfolio;
 import com.example.portfolioservice.model.StockHolding;
 import com.example.portfolioservice.service.PortfolioService;
@@ -69,13 +70,9 @@ public class PortfolioController {
     public ResponseEntity<StockHolding> addStock(
             @Parameter(description = "ID of the portfolio")
             @PathVariable Long portfolioId,
-            @Parameter(description = "Stock symbol (e.g., AAPL)")
-            @RequestParam String symbol,
-            @Parameter(description = "Number of shares")
-            @RequestParam Integer quantity,
-            @Parameter(description = "Price per share")
-            @RequestParam Double price) {
-        return ResponseEntity.ok(portfolioService.addStock(portfolioId, symbol, quantity, price));
+            @Parameter(description = "Stock details")
+            @RequestBody AddStockRequest request) {
+        return ResponseEntity.ok(portfolioService.addStock(portfolioId, request.getSymbol(), request.getQuantity(), request.getPrice()));
     }
 
     @DeleteMapping("/{portfolioId}/stocks/{symbol}")
@@ -84,10 +81,10 @@ public class PortfolioController {
         description = "Removes a stock from an existing portfolio. Query param 'reduce' is optional and ignored for now."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Stock removed successfully"),
+        @ApiResponse(responseCode = "200", description = "Stock removed successfully"),
         @ApiResponse(responseCode = "404", description = "Portfolio or stock not found")
     })
-    public ResponseEntity<Void> removeStock(
+    public ResponseEntity<Portfolio> removeStock(
         @PathVariable Long portfolioId,
         @PathVariable String symbol,
         @RequestParam(required = false) Integer reduce) {
@@ -96,7 +93,7 @@ public class PortfolioController {
         } else {
             portfolioService.removeStock(portfolioId, symbol);
         }
-        return ResponseEntity.noContent().build();  // 204 No Content
+        return ResponseEntity.ok(portfolioService.getPortfolio(portfolioId));
     }
 
     @Operation(summary = "Get portfolio holdings", description = "Retrieves all stock holdings in a portfolio")

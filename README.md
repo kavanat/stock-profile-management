@@ -1,55 +1,109 @@
-# Portfolio Management Application
+# Stock Portfolio Tracker
 
-A full-stack application for managing stock portfolios with real-time stock data.
+A full-stack application for tracking and managing your stock portfolio. Built with Angular and Spring Boot.
+
+## Features
+
+- 📈 Real-time stock price tracking
+- 💼 Create and manage multiple portfolios
+- 🔍 Search and add stocks to your portfolio
+- 📊 Track portfolio performance
+- 🗑️ Delete or reduce stock holdings
+- ⚠️ Warning system for high-value stocks
+- 🔒 Secure API access
 
 ## Prerequisites
 
-- Java 17 or later
-- Node.js and npm
-- Maven (will be installed automatically by setup script)
+- Node.js (v16 or higher)
+- Java 17 or higher
+- Maven
+- Angular CLI
 
-## Setup Instructions
+## Quick Start
 
-1. Clone the repository (if you haven't already)
-2. Run the setup script:
+### Backend Setup
+
+1. Navigate to the backend directory:
    ```bash
-   ./setup.sh
+   cd backend
    ```
-   This will:
-   - Install Homebrew (if not present)
-   - Install Maven (if not present)
-   - Set up the Maven wrapper
-   - Verify Java installation
 
-## Running the Application
+2. Start the backend services:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-### Backend
-```bash
-cd backend/portfolio-service
-./mvnw spring-boot:run
-```
-The backend will run on http://localhost:8080
+The backend will run on `http://localhost:8080`
 
-### Frontend
-```bash
-cd frontend
-npm start
-```
-The frontend will run on http://localhost:4200
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   ng serve
+   ```
+
+The application will be available at `http://localhost:4200`
+
+## How to Use
+
+### Creating a Portfolio
+
+1. Open the application in your browser
+2. Click "Create New Portfolio"
+3. Enter a name for your portfolio
+4. Click "Create"
+
+### Adding Stocks
+
+1. Select your portfolio from the dropdown
+2. Click "Add Stock"
+3. Search for a stock by symbol (e.g., AAPL, GOOGL)
+4. Select the stock from the dropdown
+5. Enter the quantity you want to add
+6. Click "Add to Portfolio"
+
+### Managing Stocks
+
+- **View Details**: Click on any stock to see detailed information
+- **Delete Stock**: Click the delete icon next to a stock
+- **Reduce Quantity**: Click the reduce icon and enter the amount to reduce
+- **Track Performance**: View your portfolio's total value and profit/loss
+
+### Important Notes
+
+- High-value stocks (>$1000) will show a warning message
+- Some stocks may require special permissions to access
+- Stock prices are updated in real-time
+- You can have multiple portfolios
+
+## API Keys
+
+The application uses the following API keys:
+- Finnhub API Key: `cvmh459r01qltjkglgcgcvmh459r01qltjkglgd0`
 
 ## Troubleshooting
 
 If you encounter any issues:
 
-1. Make sure you're in the correct directory when running commands
-2. Run the setup script again to ensure all dependencies are properly installed
-3. Check that Java 17 is installed and JAVA_HOME is set correctly
-4. Verify that ports 8080 and 4200 are not in use by other applications
+1. Check if both backend and frontend services are running
+2. Verify your internet connection
+3. Clear your browser cache
+4. Check the browser console for error messages
 
-## Features
+## Support
 
-- Real-time stock price updates using Alpha Vantage API
-- Portfolio management with add/remove stocks
-- Stock search functionality
-- Portfolio performance tracking
-- Responsive design
+For any questions or issues, please create an issue in the repository.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
