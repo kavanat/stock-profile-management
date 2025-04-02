@@ -33,10 +33,9 @@ public class PortfolioService {
     }
 
     @Transactional
-    public Portfolio createPortfolio(String name, String userId) {
-        Portfolio portfolio = new Portfolio();
-        portfolio.setName(name);
-        portfolio.setUserId(userId);
+    public Portfolio createPortfolio(Portfolio portfolio) {
+        portfolio.setTotalValue(0.0);
+        portfolio.setUserId("default-user"); // For now, we'll use a default user
         return portfolioRepository.save(portfolio);
     }
 
@@ -148,5 +147,47 @@ public class PortfolioService {
                 .sum();
         portfolio.setTotalValue(totalValue);
         portfolioRepository.save(portfolio);
+    }
+
+    @Transactional
+    public StockHolding reduceStockQuantity(Long portfolioId, String symbol, Integer quantityToReduce) {
+        if (quantityToReduce <= 0) {
+            throw new RuntimeException("Quantity to reduce must be positive");
+        }
+
+        // First check if the stock exists
+        Optional<StockHolding> holdingOpt = stockHoldingRepository.findByPortfolioIdAndSymbol(portfolioId, symbol);
+        if (holdingOpt.isEmpty()) {
+            throw new RuntimeException("Stock not found in portfolio");
+        }
+
+        StockHolding holding = holdingOpt.get();
+        if (holding.getQuantity() < quantityToReduce) {
+            throw new RuntimeException("Cannot reduce more than available quantity");
+        }
+
+        // Get the portfolio
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found"));
+
+        // Update the quantity
+        holding.setQuantity(holding.getQuantity() - quantityToReduce);
+
+        // If quantity becomes 0, remove the holding completely
+        if (holding.getQuantity() == 0) {
+            portfolio.getHoldings().remove(holding);
+            stockHoldingRepository.delete(holding);
+            holding = null;
+        } else {
+            // Update current value
+            Double currentPrice = marketDataService.getCurrentPrice(symbol);
+            holding.setCurrentValue(holding.getQuantity() * currentPrice);
+            holding = stockHoldingRepository.save(holding);
+        }
+
+        // Update portfolio total value
+        updatePortfolioTotalValue(portfolio);
+
+        return holding;
     }
 } 

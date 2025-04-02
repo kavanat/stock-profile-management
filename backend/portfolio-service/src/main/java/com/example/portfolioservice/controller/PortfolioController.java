@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,23 +31,20 @@ public class PortfolioController {
     })
     @GetMapping
     public ResponseEntity<List<Portfolio>> getAllPortfolios(
-            @Parameter(description = "ID of the user") 
+            @Parameter(description = "ID of the user")
             @RequestParam String userId) {
         return ResponseEntity.ok(portfolioService.getAllPortfolios(userId));
     }
 
-    @Operation(summary = "Create a new portfolio", description = "Creates a new portfolio with the given name")
+    @PostMapping
+    @Operation(summary = "Create a new portfolio")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Portfolio created successfully"),
+        @ApiResponse(responseCode = "201", description = "Portfolio created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    @PostMapping
-    public ResponseEntity<Portfolio> createPortfolio(
-            @Parameter(description = "Name of the portfolio") 
-            @RequestParam String name,
-            @Parameter(description = "ID of the user")
-            @RequestParam String userId) {
-        return ResponseEntity.ok(portfolioService.createPortfolio(name, userId));
+    public ResponseEntity<Portfolio> createPortfolio(@RequestBody Portfolio portfolio) {
+        Portfolio createdPortfolio = portfolioService.createPortfolio(portfolio);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPortfolio);
     }
 
     @Operation(summary = "Get portfolio by ID", description = "Retrieves a portfolio by its ID")
@@ -56,7 +54,7 @@ public class PortfolioController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<Portfolio> getPortfolio(
-            @Parameter(description = "ID of the portfolio") 
+            @Parameter(description = "ID of the portfolio")
             @PathVariable Long id) {
         return ResponseEntity.ok(portfolioService.getPortfolio(id));
     }
@@ -69,30 +67,36 @@ public class PortfolioController {
     })
     @PostMapping("/{portfolioId}/stocks")
     public ResponseEntity<StockHolding> addStock(
-            @Parameter(description = "ID of the portfolio") 
+            @Parameter(description = "ID of the portfolio")
             @PathVariable Long portfolioId,
-            @Parameter(description = "Stock symbol (e.g., AAPL)") 
+            @Parameter(description = "Stock symbol (e.g., AAPL)")
             @RequestParam String symbol,
-            @Parameter(description = "Number of shares") 
+            @Parameter(description = "Number of shares")
             @RequestParam Integer quantity,
-            @Parameter(description = "Price per share") 
+            @Parameter(description = "Price per share")
             @RequestParam Double price) {
         return ResponseEntity.ok(portfolioService.addStock(portfolioId, symbol, quantity, price));
     }
 
-    @Operation(summary = "Remove stock from portfolio", description = "Removes a stock from an existing portfolio")
+    @DeleteMapping("/{portfolioId}/stocks/{symbol}")
+    @Operation(
+        summary = "Remove stock from portfolio",
+        description = "Removes a stock from an existing portfolio. Query param 'reduce' is optional and ignored for now."
+    )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Stock removed successfully"),
+        @ApiResponse(responseCode = "204", description = "Stock removed successfully"),
         @ApiResponse(responseCode = "404", description = "Portfolio or stock not found")
     })
-    @DeleteMapping("/{portfolioId}/stocks/{symbol}")
     public ResponseEntity<Void> removeStock(
-            @Parameter(description = "ID of the portfolio") 
-            @PathVariable Long portfolioId,
-            @Parameter(description = "Stock symbol to remove") 
-            @PathVariable String symbol) {
-        portfolioService.removeStock(portfolioId, symbol);
-        return ResponseEntity.ok().build();
+        @PathVariable Long portfolioId,
+        @PathVariable String symbol,
+        @RequestParam(required = false) Integer reduce) {
+        if (reduce != null) {
+            portfolioService.reduceStockQuantity(portfolioId, symbol, reduce);
+        } else {
+            portfolioService.removeStock(portfolioId, symbol);
+        }
+        return ResponseEntity.noContent().build();  // 204 No Content
     }
 
     @Operation(summary = "Get portfolio holdings", description = "Retrieves all stock holdings in a portfolio")
@@ -102,8 +106,25 @@ public class PortfolioController {
     })
     @GetMapping("/{portfolioId}/holdings")
     public ResponseEntity<List<StockHolding>> getPortfolioHoldings(
-            @Parameter(description = "ID of the portfolio") 
+            @Parameter(description = "ID of the portfolio")
             @PathVariable Long portfolioId) {
         return ResponseEntity.ok(portfolioService.getPortfolioHoldings(portfolioId));
+    }
+
+    @Operation(summary = "Reduce stock quantity", description = "Reduces the quantity of a stock in a portfolio")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Stock quantity reduced successfully"),
+        @ApiResponse(responseCode = "404", description = "Portfolio or stock not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    @PutMapping("/{portfolioId}/stocks/{symbol}/reduce")
+    public ResponseEntity<StockHolding> reduceStockQuantity(
+            @Parameter(description = "ID of the portfolio")
+            @PathVariable Long portfolioId,
+            @Parameter(description = "Stock symbol to reduce")
+            @PathVariable String symbol,
+            @Parameter(description = "Quantity to reduce")
+            @RequestParam Integer quantity) {
+        return ResponseEntity.ok(portfolioService.reduceStockQuantity(portfolioId, symbol, quantity));
     }
 }

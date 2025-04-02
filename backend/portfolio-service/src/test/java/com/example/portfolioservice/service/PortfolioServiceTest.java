@@ -45,14 +45,20 @@ class PortfolioServiceTest {
 
     @Test
     void testCreatePortfolio() {
+        // Arrange
+        Portfolio inputPortfolio = new Portfolio();
+        inputPortfolio.setName("Test Portfolio");
+        inputPortfolio.setUserId("testUser");
+        inputPortfolio.setTotalValue(0.0);
+        
         when(portfolioRepository.save(any(Portfolio.class))).thenReturn(testPortfolio);
 
-        Portfolio created = portfolioService.createPortfolio("Test Portfolio", "testUser");
+        // Act
+        Portfolio created = portfolioService.createPortfolio(inputPortfolio);
 
+        // Assert
         assertNotNull(created);
         assertEquals("Test Portfolio", created.getName());
-        assertEquals("testUser", created.getUserId());
-        assertEquals(0.0, created.getTotalValue());
         verify(portfolioRepository).save(any(Portfolio.class));
     }
 
@@ -89,5 +95,26 @@ class PortfolioServiceTest {
         assertEquals(testPortfolio, stock.getPortfolio());
         verify(stockHoldingRepository).save(any(StockHolding.class));
         verify(marketDataService).getCurrentPrice("AAPL");
+    }
+
+    @Test
+    void createPortfolio_Success() {
+        // Arrange
+        Portfolio portfolio = new Portfolio();
+        portfolio.setName("Test Portfolio");
+        portfolio.setUserId("testUser");
+        portfolio.setTotalValue(0.0);
+        
+        when(portfolioRepository.save(any(Portfolio.class))).thenReturn(portfolio);
+        
+        // Act
+        Portfolio result = portfolioService.createPortfolio(portfolio);
+        
+        // Assert
+        assertNotNull(result);
+        assertEquals("Test Portfolio", result.getName());
+        assertEquals("testUser", result.getUserId());
+        assertEquals(0.0, result.getTotalValue());
+        verify(portfolioRepository).save(any(Portfolio.class));
     }
 } 

@@ -6,32 +6,79 @@
           <h2 class="mb-0">My Portfolio</h2>
         </div>
         <div class="card-body">
-          <div *ngIf="!portfolio" class="text-center">
+          <!-- Alert Messages -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = null"></button>
+          </div>
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ success }}
+            <button type="button" class="btn-close" (click)="success = null"></button>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div *ngIf="isLoading" class="text-center">
             <div class="spinner-border" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
 
-          <div *ngIf="portfolio">
+          <div *ngIf="portfolio && !isLoading">
+            <!-- Search and Filter -->
+            <div class="mb-3">
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="Search stocks..." 
+                     [(ngModel)]="searchTerm">
+            </div>
+
             <div class="table-responsive">
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>Symbol</th>
-                    <th>Quantity</th>
-                    <th>Average Price</th>
-                    <th>Current Value</th>
+                    <th (click)="sort('symbol')" style="cursor: pointer">
+                      Symbol
+                      <i class="fas" [ngClass]="{
+                        'fa-sort-up': sortField === 'symbol' && sortDirection === 'asc',
+                        'fa-sort-down': sortField === 'symbol' && sortDirection === 'desc',
+                        'fa-sort': sortField !== 'symbol'
+                      }"></i>
+                    </th>
+                    <th (click)="sort('quantity')" style="cursor: pointer">
+                      Quantity
+                      <i class="fas" [ngClass]="{
+                        'fa-sort-up': sortField === 'quantity' && sortDirection === 'asc',
+                        'fa-sort-down': sortField === 'quantity' && sortDirection === 'desc',
+                        'fa-sort': sortField !== 'quantity'
+                      }"></i>
+                    </th>
+                    <th (click)="sort('averagePrice')" style="cursor: pointer">
+                      Average Price
+                      <i class="fas" [ngClass]="{
+                        'fa-sort-up': sortField === 'averagePrice' && sortDirection === 'asc',
+                        'fa-sort-down': sortField === 'averagePrice' && sortDirection === 'desc',
+                        'fa-sort': sortField !== 'averagePrice'
+                      }"></i>
+                    </th>
+                    <th (click)="sort('currentValue')" style="cursor: pointer">
+                      Current Value
+                      <i class="fas" [ngClass]="{
+                        'fa-sort-up': sortField === 'currentValue' && sortDirection === 'asc',
+                        'fa-sort-down': sortField === 'currentValue' && sortDirection === 'desc',
+                        'fa-sort': sortField !== 'currentValue'
+                      }"></i>
+                    </th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let holding of holdings">
+                  <tr *ngFor="let holding of sortedHoldings">
                     <td>{{ holding.symbol }}</td>
                     <td>{{ holding.quantity }}</td>
-                    <td>${{ holding.averagePrice.toFixed(2) }}</td>
-                    <td>${{ holding.currentValue.toFixed(2) }}</td>
+                    <td>{{ formatCurrency(holding.averagePrice) }}</td>
+                    <td>{{ formatCurrency(holding.currentValue) }}</td>
                     <td>
-                      <button class="btn btn-danger btn-sm" (click)="deleteStock(holding)">
+                      <button class="btn btn-danger btn-sm" (click)="confirmDelete(holding)" [disabled]="isDeleting">
                         <i class="fas fa-trash"></i>
                       </button>
                     </td>
@@ -41,7 +88,18 @@
             </div>
 
             <div class="mt-4">
-              <h4>Total Portfolio Value: ${{ portfolio.totalValue.toFixed(2) }}</h4>
+              <div class="row">
+                <div class="col-md-6">
+                  <h4>Total Portfolio Value: {{ formatCurrency(portfolio.totalValue) }}</h4>
+                  <p class="text-muted">Number of stocks: {{ remainingStocksCount }}</p>
+                </div>
+                <div class="col-md-6">
+                  <h4>Portfolio Performance</h4>
+                  <p [ngClass]="{'text-success': portfolioPerformance.value >= 0, 'text-danger': portfolioPerformance.value < 0}">
+                    {{ formatCurrency(portfolioPerformance.value) }} ({{ portfolioPerformance.percentage.toFixed(2) }}%)
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -60,3 +118,44 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="stockToDelete" class="modal fade show" style="display: block;" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reduce Stock Quantity</h5>
+        <button type="button" class="btn-close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Stock: {{ stockToDelete.symbol }}</p>
+        <p>Current Quantity: {{ stockToDelete.quantity }}</p>
+        <p>Current Value: {{ formatCurrency(stockToDelete.currentValue) }}</p>
+        
+        <div class="form-group">
+          <label for="quantityToDelete">Quantity to Remove:</label>
+          <input type="number" 
+                 class="form-control" 
+                 id="quantityToDelete" 
+                 [(ngModel)]="quantityToDelete" 
+                 [min]="1" 
+                 [max]="maxQuantity">
+          <small class="form-text text-muted">
+            Enter the number of shares to remove (1 to {{ maxQuantity }})
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button type="button" 
+                class="btn btn-danger" 
+                (click)="deleteStock()" 
+                [disabled]="isDeleting || quantityToDelete < 1 || quantityToDelete > maxQuantity">
+          <span *ngIf="isDeleting" class="spinner-border spinner-border-sm me-1"></span>
+          {{ quantityToDelete >= maxQuantity ? 'Delete All' : 'Remove Shares' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="stockToDelete" class="modal-backdrop fade show"></div>
