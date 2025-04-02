@@ -56,13 +56,6 @@ The application will be available at `http://localhost:4200`
 
 ## How to Use
 
-### Creating a Portfolio
-
-1. Open the application in your browser
-2. Click "Create New Portfolio"
-3. Enter a name for your portfolio
-4. Click "Create"
-
 ### Adding Stocks
 
 1. Select your portfolio from the dropdown
@@ -99,11 +92,3 @@ If you encounter any issues:
 2. Verify your internet connection
 3. Clear your browser cache
 4. Check the browser console for error messages
-
-## Support
-
-For any questions or issues, please create an issue in the repository.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
