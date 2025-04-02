@@ -58,9 +58,9 @@ export class PortfolioComponent implements OnInit {
     this.loadPortfolio();
   }
 
-  deleteStock(stockId: number): void {
+  deleteStock(holding: StockHolding): void {
     if (this.portfolio) {
-      this.portfolioService.deleteStock(this.portfolioId, stockId.toString()).subscribe({
+      this.portfolioService.deleteStock(this.portfolioId, holding.symbol).subscribe({
         next: () => {
           this.loadPortfolio();
         },

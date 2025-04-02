@@ -21,6 +21,9 @@ public class Portfolio {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String userId;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockHolding> holdings = new ArrayList<>();

@@ -10,7 +10,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "stock_holdings")
+@Table(name = "stock_holdings", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"portfolio_id", "symbol"})
+})
 public class StockHolding {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

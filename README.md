@@ -60,8 +60,8 @@ A full-stack application for managing stock portfolios, built with Angular and S
 
 ## Accessing the Application
 
-- Frontend: http://localhost:4200
-- Backend API: http://localhost:8080
+- Frontend: http://localhost:4201
+- Backend API: http://localhost:8081
 
 ## Author
 

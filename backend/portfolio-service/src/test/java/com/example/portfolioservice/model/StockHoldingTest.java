@@ -1,6 +1,6 @@
 package com.example.portfolioservice.model;
 
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StockHoldingTest {
@@ -36,4 +36,4 @@ class StockHoldingTest {
         assertEquals(2800.0, stockHolding.getAveragePrice());
         assertEquals(14000.0, stockHolding.getCurrentValue());
     }
-} 
+}

@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Portfolio } from '../models/portfolio';
 import { StockHolding } from '../models/stock-holding';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioService {
-  private apiUrl = 'http://localhost:8080/api/portfolios';
+  private apiUrl = `${environment.apiUrl}/api/portfolios`;
 
   constructor(private http: HttpClient) {}
 

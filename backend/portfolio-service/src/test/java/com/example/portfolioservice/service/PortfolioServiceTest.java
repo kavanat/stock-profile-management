@@ -47,10 +47,11 @@ class PortfolioServiceTest {
     void testCreatePortfolio() {
         when(portfolioRepository.save(any(Portfolio.class))).thenReturn(testPortfolio);
 
-        Portfolio created = portfolioService.createPortfolio("Test Portfolio");
+        Portfolio created = portfolioService.createPortfolio("Test Portfolio", "testUser");
 
         assertNotNull(created);
         assertEquals("Test Portfolio", created.getName());
+        assertEquals("testUser", created.getUserId());
         assertEquals(0.0, created.getTotalValue());
         verify(portfolioRepository).save(any(Portfolio.class));
     }

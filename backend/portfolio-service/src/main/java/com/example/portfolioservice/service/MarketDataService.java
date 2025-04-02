@@ -1,50 +1,38 @@
 package com.example.portfolioservice.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Service
-@RequiredArgsConstructor
 public class MarketDataService {
-    private static final Logger logger = LoggerFactory.getLogger(MarketDataService.class);
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-    private final Random random = new Random();
-    
-    // Mock stock prices with some variation
-    private static final Map<String, Double> MOCK_PRICES = new HashMap<>();
-    static {
-        MOCK_PRICES.put("AAPL", 175.50);
-        MOCK_PRICES.put("GOOGL", 145.20);
-        MOCK_PRICES.put("MSFT", 425.30);
-        MOCK_PRICES.put("AMZN", 180.75);
-        MOCK_PRICES.put("META", 485.25);
-        MOCK_PRICES.put("TSLA", 175.80);
-        MOCK_PRICES.put("NVDA", 925.40);
-        MOCK_PRICES.put("JPM", 180.25);
-        MOCK_PRICES.put("V", 280.50);
-        MOCK_PRICES.put("WMT", 60.15);
+    private final Map<String, Double> stockPrices = new HashMap<>();
+
+    public MarketDataService() {
+        // Initialize with some sample prices
+        stockPrices.put("AAPL", 175.50);
+        stockPrices.put("GOOGL", 145.20);
+        stockPrices.put("MSFT", 425.30);
+        stockPrices.put("AMZN", 180.75);
+        stockPrices.put("META", 485.25);
+        stockPrices.put("TSLA", 175.80);
+        stockPrices.put("NVDA", 925.40);
+        stockPrices.put("JPM", 180.25);
+        stockPrices.put("V", 280.50);
+        stockPrices.put("WMT", 60.15);
     }
 
     public Double getCurrentPrice(String symbol) {
-        // Convert symbol to uppercase for consistency
-        symbol = symbol.toUpperCase();
-        
-        // Get base price from mock data
-        Double basePrice = MOCK_PRICES.getOrDefault(symbol, 100.0);
-        
-        // Add some random variation (±5%)
-        double variation = basePrice * (random.nextDouble() * 0.1 - 0.05);
-        
-        // Round to 2 decimal places
-        return Math.round((basePrice + variation) * 100.0) / 100.0;
+        Double price = stockPrices.get(symbol);
+        if (price == null) {
+            // For unknown stocks, generate a random price between 10 and 1000
+            price = 10.0 + Math.random() * 990.0;
+            stockPrices.put(symbol, price);
+        }
+        return price;
+    }
+
+    public void updatePrice(String symbol, Double price) {
+        stockPrices.put(symbol, price);
     }
 } 
