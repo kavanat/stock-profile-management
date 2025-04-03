@@ -24,30 +24,21 @@ A full-stack application for tracking and managing your stock portfolio. Built w
 ### Backend Setup
 
 1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Start the backend services:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
+   Setup the project as maven project in the IDE
+   Use JDK 17 in project structure/IDE settings
+   Run the SpringBoot Application **PortfolioServiceApplication** using IDE
 The backend will run on `http://localhost:8080`
 
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
+   
+3. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Start the development server:
+4. Start the development server:
    ```bash
    ng serve
    ```
