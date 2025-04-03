@@ -5,7 +5,7 @@ A full-stack application for tracking and managing your stock portfolio. Built w
 ## Features
 
 - 📈 Real-time stock price tracking
-- 💼 Create and manage multiple portfolios
+- 💼 Manage Portfolio
 - 🔍 Search and add stocks to your portfolio
 - 📊 Track portfolio performance
 - 🗑️ Delete or reduce stock holdings
@@ -58,7 +58,7 @@ The application will be available at `http://localhost:4200`
 
 ### Adding Stocks
 
-1. Select your portfolio from the dropdown
+1. See the user portfolio
 2. Click "Add Stock"
 3. Search for a stock by symbol (e.g., AAPL, GOOGL)
 4. Select the stock from the dropdown
@@ -77,7 +77,6 @@ The application will be available at `http://localhost:4200`
 - High-value stocks (>$1000) will show a warning message
 - Some stocks may require special permissions to access
 - Stock prices are updated in real-time
-- You can have multiple portfolios
 
 ## Troubleshooting
 
