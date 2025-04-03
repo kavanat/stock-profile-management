@@ -77,3 +77,13 @@ If you encounter any issues:
 2. Verify your internet connection
 3. Clear your browser cache
 4. Check the browser console for error messages
+
+## Screenshots
+![image](https://github.com/user-attachments/assets/b92586d5-d72e-4382-af5a-399be8b1b708)
+![image](https://github.com/user-attachments/assets/f4b69edf-6e37-4c29-a4f0-ab3dc16fba2d)
+![image](https://github.com/user-attachments/assets/cf7337ef-62f3-4767-b70e-d3272722309f)
+![image](https://github.com/user-attachments/assets/e584a611-aafe-46c3-99cd-9fe72c94eac3)
+
+
+
+
