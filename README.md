@@ -79,11 +79,6 @@ The application will be available at `http://localhost:4200`
 - Stock prices are updated in real-time
 - You can have multiple portfolios
 
-## API Keys
-
-The application uses the following API keys:
-- Finnhub API Key: `cvmh459r01qltjkglgcgcvmh459r01qltjkglgd0`
-
 ## Troubleshooting
 
 If you encounter any issues:
